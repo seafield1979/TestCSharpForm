@@ -1,2 +1,7 @@
 *.cache
 TestCSharpForm/obj/Debug/
+.vs/TestCSharpForm/v15/Server/sqlite3/storage.ide-wal
+.vs/TestCSharpForm/v15/Server/sqlite3/storage.ide-shm
+.vs/TestCSharpForm/v15/Server/sqlite3/storage.ide
+.vs/TestCSharpForm/v15/Server/sqlite3/db.lock
+.vs/TestCSharpForm/v15/.suo
