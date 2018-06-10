@@ -68,11 +68,47 @@
     <Compile Include="FormComboBox.Designer.cs">
       <DependentUpon>FormComboBox.cs</DependentUpon>
     </Compile>
+    <Compile Include="FormListBox.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormListBox.Designer.cs">
+      <DependentUpon>FormListBox.cs</DependentUpon>
+    </Compile>
     <Compile Include="FormRadio.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="FormRadio.Designer.cs">
       <DependentUpon>FormRadio.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormSplitter1.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormSplitter1.Designer.cs">
+      <DependentUpon>FormSplitter1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormSplitter2.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormSplitter2.Designer.cs">
+      <DependentUpon>FormSplitter2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormTabControl.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormTabControl.Designer.cs">
+      <DependentUpon>FormTabControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormToolStripContainer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormToolStripContainer.Designer.cs">
+      <DependentUpon>FormToolStripContainer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormTreeView.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormTreeView.Designer.cs">
+      <DependentUpon>FormTreeView.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -88,8 +124,23 @@
     <EmbeddedResource Include="FormComboBox.resx">
       <DependentUpon>FormComboBox.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="FormListBox.resx">
+      <DependentUpon>FormListBox.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="FormRadio.resx">
       <DependentUpon>FormRadio.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormSplitter1.resx">
+      <DependentUpon>FormSplitter1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormTabControl.resx">
+      <DependentUpon>FormTabControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormToolStripContainer.resx">
+      <DependentUpon>FormToolStripContainer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormTreeView.resx">
+      <DependentUpon>FormTreeView.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

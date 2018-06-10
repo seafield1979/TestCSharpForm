@@ -47,7 +47,12 @@ namespace TestCSharpForm
                 //Application.Run(new Form1());
                 //Application.Run(new FormRadio());
                 //Application.Run(new FormCheckBox());
-                Application.Run(new FormComboBox());
+                //Application.Run(new FormComboBox());
+                //Application.Run(new FormListBox());
+                //Application.Run(new FormTreeView());
+                //Application.Run(new FormTabControl());
+                //Application.Run(new FormToolStripContainer());
+                Application.Run(new FormSplitter1());
             }
             finally
             {
