@@ -52,7 +52,11 @@ namespace TestCSharpForm
                 //Application.Run(new FormTreeView());
                 //Application.Run(new FormTabControl());
                 //Application.Run(new FormToolStripContainer());
-                Application.Run(new FormSplitter1());
+                //Application.Run(new FormSplitter1());
+                //Application.Run(new FormSplitter2());
+                //Application.Run(new FormProgressBar());
+                //Application.Run(new FormScrollBar());
+                Application.Run(new FormListView());
             }
             finally
             {
