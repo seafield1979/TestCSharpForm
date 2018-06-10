@@ -98,6 +98,12 @@
     <Compile Include="FormScrollBar.Designer.cs">
       <DependentUpon>FormScrollBar.cs</DependentUpon>
     </Compile>
+    <Compile Include="FormSplitContainer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormSplitContainer.Designer.cs">
+      <DependentUpon>FormSplitContainer.cs</DependentUpon>
+    </Compile>
     <Compile Include="FormSplitter1.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -156,6 +162,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FormScrollBar.resx">
       <DependentUpon>FormScrollBar.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormSplitContainer.resx">
+      <DependentUpon>FormSplitContainer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FormSplitter1.resx">
       <DependentUpon>FormSplitter1.cs</DependentUpon>
