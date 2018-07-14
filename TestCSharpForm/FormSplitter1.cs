@@ -62,5 +62,10 @@ namespace TestCSharpForm
                 panel4.Show();
             }
         }
+
+        private void panel2_Layout(object sender, LayoutEventArgs e)
+        {
+            
+        }
     }
 }

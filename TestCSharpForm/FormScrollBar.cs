@@ -32,5 +32,10 @@ namespace TestCSharpForm
             label3.Text = String.Format("HScroll value={0}", this.HorizontalScroll.Value);
             label4.Text = String.Format("VScroll value={0}", this.VerticalScroll.Value);
         }
+
+        private void FormScrollBar_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }

@@ -44,20 +44,53 @@ namespace TestCSharpForm
                 //はじめからMainメソッドにあったコードを実行
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
-                //Application.Run(new Form1());
-                //Application.Run(new FormRadio());
-                //Application.Run(new FormCheckBox());
-                //Application.Run(new FormComboBox());
-                //Application.Run(new FormListBox());
-                //Application.Run(new FormTreeView());
-                //Application.Run(new FormTabControl());
-                //Application.Run(new FormToolStripContainer());
-                //Application.Run(new FormSplitter1());
-                //Application.Run(new FormSplitter2());
-                Application.Run(new FormSplitContainer());
-                //Application.Run(new FormProgressBar());
-                //Application.Run(new FormScrollBar());
-                //Application.Run(new FormListView());
+
+                int mode = 14;
+                switch (mode)
+                {
+                    case 1:
+                        Application.Run(new Form1());
+                        break;
+                    case 2:
+                        Application.Run(new FormRadio());
+                        break;
+                    case 3:
+                        Application.Run(new FormCheckBox());
+                        break;
+                    case 4:
+                        Application.Run(new FormComboBox());
+                        break;
+                    case 5:
+                        Application.Run(new FormListBox());
+                        break;
+                    case 6:
+                        Application.Run(new FormTreeView());
+                        break;
+                    case 7:
+                        Application.Run(new FormToolStripContainer());
+                        break;
+                    case 8:
+                        Application.Run(new FormSplitter1());
+                        break;
+                    case 9:
+                        Application.Run(new FormSplitter2());
+                        break;
+                    case 10:
+                        Application.Run(new FormSplitContainer());
+                        break;
+                    case 11:
+                        Application.Run(new FormProgressBar());
+                        break;
+                    case 12:
+                        Application.Run(new FormScrollBar());
+                        break;
+                    case 13:
+                        Application.Run(new FormListView());
+                        break;
+                    case 14:
+                        Application.Run(new FormImage());
+                        break;
+                }
             }
             finally
             {

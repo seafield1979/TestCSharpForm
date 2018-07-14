@@ -113,6 +113,7 @@
             this.Controls.Add(this.hScrollBar1);
             this.Name = "FormScrollBar";
             this.Text = "FormScrollBar";
+            this.Load += new System.EventHandler(this.FormScrollBar_Load);
             this.Scroll += new System.Windows.Forms.ScrollEventHandler(this.FormScrollBar_Scroll);
             this.ResumeLayout(false);
             this.PerformLayout();
