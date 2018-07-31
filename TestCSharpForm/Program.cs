@@ -45,7 +45,7 @@ namespace TestCSharpForm
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
 
-                int mode = 14;
+                int mode = 12;
                 switch (mode)
                 {
                     case 1:
@@ -89,6 +89,9 @@ namespace TestCSharpForm
                         break;
                     case 14:
                         Application.Run(new FormImage());
+                        break;
+                    case 15:
+                        Application.Run(new FormPanel());
                         break;
                 }
             }

@@ -45,7 +45,19 @@ namespace TestCSharpForm
             drawMode = 3;
             Invalidate();
         }
-    
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            drawMode = 4;
+            Invalidate();
+        }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            drawMode = 5;
+            Invalidate();
+        }
+
         private void FormImage_Paint(object sender, PaintEventArgs e)
         {
             // Graphicsオブジェクトの作成
@@ -66,6 +78,11 @@ namespace TestCSharpForm
                     break;
                 case 3:
                     DrawMode4(g);
+                    break;
+                case 4:
+                    DrawMode5(g, 1);
+                    break;
+                case 5:
                     break;
             }
 
@@ -209,6 +226,48 @@ namespace TestCSharpForm
             g.DrawRectangle(Pens.Yellow, new Rectangle(100, 100, (int)stringSize.Width, (int)stringSize.Height));
         }
 
+        // クリッピング
+        public void DrawMode5(Graphics g, int mode)
+        {
+            switch (mode)
+            {
+                case 0:
+                    {
+                        // 矩形クリッピングを設定
+                        //位置(50, 50)、大きさ100x80の領域のみ描画されるようにする
+                        g.SetClip(new Rectangle(100, 100, 100, 100));
 
+                        g.FillRectangle(Brushes.Red, 0, 0, 300, 300);
+                        g.DrawLine(Pens.Blue, 0, 0, 300, 300);
+                        
+                    }
+                    break;
+                case 1:
+                    // 指定のオブジェクトで塗った部分をクリッピング
+                    {
+                        //楕円の領域を追加する
+                        GraphicsPath gp = new GraphicsPath();
+                        //gp.AddEllipse(g.VisibleClipBounds);
+                        
+                        //領域を文字列で切り抜く
+                        FontFamily font1 = new FontFamily("Arial");
+                        gp.AddString("hello world", font1, 0, 40, new Point(50, 50),
+                            StringFormat.GenericDefault);
+
+                        gp.AddEllipse(100, 100, 100, 100);
+
+                        //Regionを作成する
+                        Region rgn = new Region(gp);
+
+                        //クリッピング領域を変更する
+                        g.Clip = rgn;
+                        g.SmoothingMode = SmoothingMode.AntiAlias;
+
+                        g.FillRectangle(Brushes.Red, 0, 0, 300, 300);
+                    }
+                    break;
+            }
+        }
+       
     }
 }

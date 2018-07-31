@@ -89,6 +89,12 @@
     <Compile Include="FormListView.Designer.cs">
       <DependentUpon>FormListView.cs</DependentUpon>
     </Compile>
+    <Compile Include="FormPanel.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormPanel.Designer.cs">
+      <DependentUpon>FormPanel.cs</DependentUpon>
+    </Compile>
     <Compile Include="FormProgressBar.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -165,6 +171,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FormListView.resx">
       <DependentUpon>FormListView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormPanel.resx">
+      <DependentUpon>FormPanel.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FormProgressBar.resx">
       <DependentUpon>FormProgressBar.cs</DependentUpon>
