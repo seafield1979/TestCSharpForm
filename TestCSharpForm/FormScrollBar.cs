@@ -38,6 +38,9 @@ namespace TestCSharpForm
 
             // マウスホイール
             this.MouseWheel += new MouseEventHandler(this.MainForm_MouseWheel);
+
+            // パネルをダブルバッファ
+            
         }
 
         public void UpdateScrollBarV(int value, int max, int large)
@@ -69,7 +72,7 @@ namespace TestCSharpForm
                 vScrollBar2.Value -= e.Delta;
             }
             document1.UpdateSBV(vScrollBar2.Value, vScrollBar2.Maximum, vScrollBar2.LargeChange);
-            this.Invalidate();
+            panel1.Invalidate();
         }
 
         private void FormScrollBar_Scroll(object sender, ScrollEventArgs e)
@@ -98,26 +101,31 @@ namespace TestCSharpForm
 
         private void FormScrollBar_Paint(object sender, PaintEventArgs e)
         {
-            Graphics g = e.Graphics;
-
-            int width = this.ClientSize.Width;
-            int height = this.ClientSize.Height;
-
-            document1.Draw(g);
+            
         }
 
         private void vScrollBar2_Scroll(object sender, ScrollEventArgs e)
         {
             ScrollBar sb = (ScrollBar)sender;
             document1.UpdateSBV(sb.Value, sb.Maximum, sb.LargeChange);
-            this.Invalidate();
+            panel1.Invalidate();
         }
 
         private void hScrollBar2_Scroll(object sender, ScrollEventArgs e)
         {
             ScrollBar sb = (ScrollBar)sender;
             document1.UpdateSBH(sb.Value, sb.Maximum, sb.LargeChange);
-            this.Invalidate();
+            panel1.Invalidate();
+        }
+
+        private void panel1_Paint(object sender, PaintEventArgs e)
+        {
+            Graphics g = e.Graphics;
+
+            int width = this.ClientSize.Width;
+            int height = this.ClientSize.Height;
+
+            document1.Draw(g);
         }
     }
 
@@ -247,6 +255,15 @@ namespace TestCSharpForm
             sbH.value = value;
 
             delegateSBH(value, max, large);
+        }
+    }
+
+
+    public class DoubleBufferingPanel : System.Windows.Forms.Panel
+    {
+        public DoubleBufferingPanel()
+        {
+            this.DoubleBuffered = true;
         }
     }
 }

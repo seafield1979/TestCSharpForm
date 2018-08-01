@@ -1,4 +1,6 @@
-﻿namespace TestCSharpForm
+﻿using TestCSharpForm;
+
+namespace TestCSharpForm
 {
     partial class FormScrollBar
     {
@@ -32,32 +34,62 @@
             this.hScrollBar2 = new System.Windows.Forms.HScrollBar();
             this.vScrollBar2 = new System.Windows.Forms.VScrollBar();
             this.bindingSource1 = new System.Windows.Forms.BindingSource(this.components);
+            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            this.panel1 = new TestCSharpForm.DoubleBufferingPanel();
             ((System.ComponentModel.ISupportInitialize)(this.bindingSource1)).BeginInit();
+            this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // hScrollBar2
             // 
-            this.hScrollBar2.Location = new System.Drawing.Point(9, 561);
+            this.hScrollBar2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.hScrollBar2.Location = new System.Drawing.Point(0, 574);
             this.hScrollBar2.Name = "hScrollBar2";
-            this.hScrollBar2.Size = new System.Drawing.Size(955, 29);
+            this.hScrollBar2.Size = new System.Drawing.Size(985, 25);
             this.hScrollBar2.TabIndex = 8;
             this.hScrollBar2.Scroll += new System.Windows.Forms.ScrollEventHandler(this.hScrollBar2_Scroll);
             // 
             // vScrollBar2
             // 
-            this.vScrollBar2.Location = new System.Drawing.Point(970, 18);
+            this.vScrollBar2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.vScrollBar2.Location = new System.Drawing.Point(985, 0);
             this.vScrollBar2.Name = "vScrollBar2";
-            this.vScrollBar2.Size = new System.Drawing.Size(31, 537);
+            this.vScrollBar2.Size = new System.Drawing.Size(25, 574);
             this.vScrollBar2.TabIndex = 9;
             this.vScrollBar2.Scroll += new System.Windows.Forms.ScrollEventHandler(this.vScrollBar2_Scroll);
+            // 
+            // tableLayoutPanel1
+            // 
+            this.tableLayoutPanel1.ColumnCount = 2;
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 25F));
+            this.tableLayoutPanel1.Controls.Add(this.vScrollBar2, 1, 0);
+            this.tableLayoutPanel1.Controls.Add(this.hScrollBar2, 0, 1);
+            this.tableLayoutPanel1.Controls.Add(this.panel1, 0, 0);
+            this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
+            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
+            this.tableLayoutPanel1.RowCount = 2;
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(1010, 599);
+            this.tableLayoutPanel1.TabIndex = 10;
+            // 
+            // panel1
+            // 
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel1.Location = new System.Drawing.Point(3, 3);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(979, 568);
+            this.panel1.TabIndex = 10;
+            this.panel1.Paint += new System.Windows.Forms.PaintEventHandler(this.panel1_Paint);
             // 
             // FormScrollBar
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1010, 599);
-            this.Controls.Add(this.vScrollBar2);
-            this.Controls.Add(this.hScrollBar2);
+            this.Controls.Add(this.tableLayoutPanel1);
             this.DoubleBuffered = true;
             this.Name = "FormScrollBar";
             this.Text = "FormScrollBar";
@@ -66,6 +98,7 @@
             this.Paint += new System.Windows.Forms.PaintEventHandler(this.FormScrollBar_Paint);
             this.Resize += new System.EventHandler(this.FormScrollBar_Resize);
             ((System.ComponentModel.ISupportInitialize)(this.bindingSource1)).EndInit();
+            this.tableLayoutPanel1.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -74,5 +107,7 @@
         private System.Windows.Forms.HScrollBar hScrollBar2;
         private System.Windows.Forms.VScrollBar vScrollBar2;
         private System.Windows.Forms.BindingSource bindingSource1;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
+        private DoubleBufferingPanel panel1;
     }
 }
