@@ -149,6 +149,7 @@
     <Compile Include="FormTreeView.Designer.cs">
       <DependentUpon>FormTreeView.cs</DependentUpon>
     </Compile>
+    <Compile Include="LVDocument1.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form1.resx">
