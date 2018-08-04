@@ -30,17 +30,7 @@ namespace TestCSharpForm
 
         private void Initialize()
         {
-            document1 = new Document1(this.ClientSize.Width, this.ClientSize.Height, UpdateScrollBarV, UpdateScrollBarH);
-
-            hScrollBar2.Maximum = 10000;
-            hScrollBar2.LargeChange = ClientSize.Width;
-            hScrollBar2.Value = 0;
-
-            vScrollBar2.Maximum = 10000;
-            vScrollBar2.LargeChange = ClientSize.Height;
-            vScrollBar2.Value = 0;
-
-
+            document1 = new Document1(this.ClientSize.Width, this.ClientSize.Height, hScrollBar2, vScrollBar2);
 
             // マウスホイールのイベント登録
             this.MouseWheel += new MouseEventHandler(this.MainForm_MouseWheel);
@@ -59,12 +49,31 @@ namespace TestCSharpForm
 
         private void ScrollX(int move)
         {
-
+            
         }
 
         private void ScrollY(int move)
         {
+            vScrollBar2.Value += move;
+            panel1.Invalidate();
+        }
 
+        // zoom::
+        private void ZoomUp()
+        {
+            if (document1.ZoomUp())
+            {
+                panel1.Invalidate();
+            }
+        }
+
+        private void ZoomDown()
+        {
+            if (document1.ZoomDown())
+            {
+                panel1.Invalidate();
+            }
+            ;
         }
 
         #endregion メソッド
@@ -170,6 +179,39 @@ namespace TestCSharpForm
                 }
             }
         }
+        
+        private void FormScrollBar_KeyDown(object sender, KeyEventArgs e)
+        {
+            Debug.WriteLine(String.Format("keydown:{0}", e.KeyValue));
+
+            switch((Keys)e.KeyValue)
+            {
+                case Keys.Left:
+                    break;
+                case Keys.Up:
+                    ZoomDown();
+                    break;
+                case Keys.Right:
+                    break;
+                case Keys.Down:
+                    ZoomUp();
+                    break;
+                case Keys.Control:
+                    break;
+                case Keys.PageDown:
+                    if (document1.ScrollDown())
+                    {
+                        panel1.Invalidate();
+                    }
+                    break;
+                case Keys.PageUp:
+                    if (document1.ScrollUp())
+                    {
+                        panel1.Invalidate();
+                    }
+                    break;
+            }
+        }
         #endregion イベント
 
     }
@@ -213,14 +255,18 @@ namespace TestCSharpForm
 
         private Image image;                // LogView描画先のImage
 
-        // delegate
-        UpdateScroll delegateSBV;
-        UpdateScroll delegateSBH;
+        HScrollBar scrollBarH;
+        VScrollBar scrollBarV;
+
+        float zoomRate = 1.0f;
 
         #endregion
 
-        public Document1(int width, int height, UpdateScroll delegateSBV, UpdateScroll delegateSBH)
+        public Document1(int width, int height, HScrollBar scrollBarH, VScrollBar scrollBarV)
         {
+
+            this.scrollBarH = scrollBarH;
+            this.scrollBarV = scrollBarV;
             sbV = new SBInfo();
             sbV.Init(0, 10000, height - (topMarginY + bottomMarginY));
             sbH = new SBInfo();
@@ -228,8 +274,6 @@ namespace TestCSharpForm
 
             Resize(width, height);
 
-            this.delegateSBV = delegateSBV;
-            this.delegateSBH = delegateSBH;
         }
 
         // 
@@ -244,8 +288,20 @@ namespace TestCSharpForm
 
             image = new Bitmap(width, height);
 
-            sbH.large = width - (topMarginX + bottomMarginX);
-            sbV.large = height - (topMarginY + bottomMarginY);
+            scrollBarH.LargeChange = sbH.large = width - (topMarginX + bottomMarginX);
+            scrollBarV.LargeChange = sbV.large = height - (topMarginY + bottomMarginY);
+
+            scrollBarH.LargeChange = sbH.large;
+            scrollBarH.Maximum = sbH.max;
+
+            scrollBarV.LargeChange = sbV.large;
+            scrollBarV.Maximum = sbV.max;
+
+        }
+
+        public void setZoomRate(float zoomRate)
+        {
+            this.zoomRate = zoomRate;
         }
 
         public bool ScrollX(int delta)
@@ -265,7 +321,7 @@ namespace TestCSharpForm
 
             if (oldValue != sbH.value)
             {
-                delegateSBH(sbH.value);
+                scrollBarH.Value = sbH.value;
                 return true;
             }
             return false;
@@ -287,10 +343,20 @@ namespace TestCSharpForm
             }
             if (oldValue != sbV.value)
             {
-                delegateSBV(sbV.value);
+                scrollBarV.Value = sbV.value;
                 return true;
             }
             return false;
+        }
+
+        public bool ScrollDown()
+        {
+            return ScrollY(sbV.large);
+        }
+
+        public bool ScrollUp()
+        {
+            return ScrollY(-sbV.large);
         }
 
         public void Draw(Graphics g)
@@ -300,16 +366,27 @@ namespace TestCSharpForm
                 // clear background
                 g2.FillRectangle(Brushes.Black, 0, 0, image.Width, image.Height);
 
-                int x = topMarginX + sbH.value  - (sbH.value % intervalX);
-                int y = topMarginY + sbV.value  - (sbV.value % intervalY);
-                
                 var font1 = new Font("Arial", 12);
+
+                // テキスト表示
+                int x0 = 10;
+                int y0 = 10;
+
+                g2.DrawString(String.Format("value {0},{1} max {2},{3}", sbH.value, sbV.value, sbH.max, sbV.max), font1, Brushes.White, x0, y0);
+                y0 += 25;
+                g2.DrawString(String.Format("large {0}", sbH.large, sbV.large), font1, Brushes.White, x0, y0);
+                y0 += 25;
+                g2.DrawString(String.Format("zoomRate {0}", zoomRate), font1, Brushes.White, x0, y0);
+                y0 += 25;
 
                 // クリッピング設定
                 Rectangle rect1 = new Rectangle(topMarginX, topMarginY, sbH.large, sbV.large);
                 g2.SetClip(rect1);
 
                 g2.FillRectangle(Brushes.DarkRed, rect1);
+
+                int x = topMarginX + sbH.value - (sbH.value % intervalX);
+                int y = topMarginY + sbV.value - (sbV.value % intervalY);
 
                 // 横のライン
                 bool drawStr = true;
@@ -318,7 +395,7 @@ namespace TestCSharpForm
                     if (drawStr)
                     {
                         //drawStr = false;
-                        g2.DrawString(String.Format("{0}ms", y ), font1, Brushes.Yellow, topMarginX, y - sbV.value);
+                        g2.DrawString(String.Format("{0}ms", (y - topMarginY) / zoomRate ), font1, Brushes.Yellow, topMarginX, y - sbV.value);
                     }
                     g2.DrawLine(Pens.White, topMarginX, y - sbV.value, image.Width - bottomMarginX, y - sbV.value);
                     y += intervalY;
@@ -330,7 +407,7 @@ namespace TestCSharpForm
                     if (drawStr)
                     {
                         //drawStr = false;
-                        g2.DrawString(String.Format("{0}ms", x), font1, Brushes.Yellow, x - sbH.value, topMarginY);
+                        g2.DrawString(String.Format("{0}ms", (x - topMarginX) / zoomRate), font1, Brushes.Yellow, x - sbH.value, topMarginY);
                     }
                     g2.DrawLine(Pens.White, x - sbH.value, topMarginY, x - sbH.value, image.Height - bottomMarginY);
                     x += intervalX;
@@ -346,7 +423,8 @@ namespace TestCSharpForm
             // スクロールバーに反映
             sbV.value = value;
 
-            delegateSBV(value);
+            scrollBarV.Value = value;
+            Debug.WriteLine(String.Format("sbV value:{0} max:{1} large:{2}", scrollBarV.Value, scrollBarV.Maximum, scrollBarV.LargeChange));
         }
 
         // Document側で表示情報を更新
@@ -355,7 +433,34 @@ namespace TestCSharpForm
             // スクロールバーに反映
             sbH.value = value;
 
-            delegateSBH(value);
+            scrollBarH.Value = value;
+            Debug.WriteLine(String.Format("sbH value:{0} max:{1} large:{2}", scrollBarH.Value, scrollBarH.Maximum, scrollBarH.LargeChange));
+        }
+
+
+        // zoom::
+        // 拡大
+        public bool ZoomUp()
+        {
+            zoomRate *= 1.2f;
+            ChangeZoomRate();
+            return true;
+        }
+
+        // 縮小
+        public bool ZoomDown()
+        {
+            zoomRate *= 0.8f;
+            ChangeZoomRate();
+            return true;
+        }
+
+        // 拡大率が変化したときの処理
+        private void ChangeZoomRate()
+        {
+            // 拡大したときの動作としてスクロールバーのmaxが変化するパターンと
+            // LargeChangeが変化するパターンがあるが、ここではmaxが変換するパターンを採用
+            scrollBarH.Maximum = sbV.max = (int)(10000.0f * zoomRate);
         }
     }
 

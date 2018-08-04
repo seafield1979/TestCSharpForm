@@ -42,19 +42,21 @@ namespace TestCSharpForm
             // 
             // hScrollBar2
             // 
-            this.hScrollBar2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.hScrollBar2.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.hScrollBar2.Location = new System.Drawing.Point(0, 574);
+            this.hScrollBar2.Margin = new System.Windows.Forms.Padding(0, 0, 0, 3);
             this.hScrollBar2.Name = "hScrollBar2";
-            this.hScrollBar2.Size = new System.Drawing.Size(985, 25);
+            this.hScrollBar2.Size = new System.Drawing.Size(985, 22);
             this.hScrollBar2.TabIndex = 8;
             this.hScrollBar2.Scroll += new System.Windows.Forms.ScrollEventHandler(this.hScrollBar2_Scroll);
             // 
             // vScrollBar2
             // 
-            this.vScrollBar2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.vScrollBar2.Dock = System.Windows.Forms.DockStyle.Right;
             this.vScrollBar2.Location = new System.Drawing.Point(985, 0);
+            this.vScrollBar2.Margin = new System.Windows.Forms.Padding(0, 0, 3, 0);
             this.vScrollBar2.Name = "vScrollBar2";
-            this.vScrollBar2.Size = new System.Drawing.Size(25, 574);
+            this.vScrollBar2.Size = new System.Drawing.Size(22, 574);
             this.vScrollBar2.TabIndex = 9;
             this.vScrollBar2.Scroll += new System.Windows.Forms.ScrollEventHandler(this.vScrollBar2_Scroll);
             // 
@@ -100,6 +102,7 @@ namespace TestCSharpForm
             this.Load += new System.EventHandler(this.FormScrollBar_Load);
             this.Scroll += new System.Windows.Forms.ScrollEventHandler(this.FormScrollBar_Scroll);
             this.Paint += new System.Windows.Forms.PaintEventHandler(this.FormScrollBar_Paint);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.FormScrollBar_KeyDown);
             this.Resize += new System.EventHandler(this.FormScrollBar_Resize);
             ((System.ComponentModel.ISupportInitialize)(this.bindingSource1)).EndInit();
             this.tableLayoutPanel1.ResumeLayout(false);
