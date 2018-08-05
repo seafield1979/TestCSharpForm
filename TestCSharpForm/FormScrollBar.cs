@@ -33,7 +33,7 @@ namespace TestCSharpForm
 
         private void Initialize()
         {
-            document1 = new LVDocument1(this.ClientSize.Width, this.ClientSize.Height, hScrollBar2, vScrollBar2);
+            document1 = new LVDocument1(this.ClientSize.Width, this.ClientSize.Height, 0, hScrollBar2, vScrollBar2);
 
             // マウスホイールのイベント登録
             this.MouseWheel += new MouseEventHandler(this.MainForm_MouseWheel);
@@ -219,6 +219,14 @@ namespace TestCSharpForm
                     {
                         panel1.Invalidate();
                     }
+                    break;
+                case Keys.V:
+                    document1.SetDirection(0);
+                    panel1.Invalidate();
+                    break;
+                case Keys.H:
+                    document1.SetDirection(1);
+                    panel1.Invalidate();
                     break;
             }
         }

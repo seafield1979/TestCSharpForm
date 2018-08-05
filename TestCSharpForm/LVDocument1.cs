@@ -9,22 +9,6 @@ using System.Windows.Forms;
 
 namespace TestCSharpForm
 {
-
-    //public struct SBInfo
-    //{
-    //    public int max;
-    //    public int large;
-    //    public int value;
-
-    //    public void Init(int value, int max, int large)
-    //    {
-    //        this.value = value;
-    //        this.max = max;
-    //        this.large = large;
-    //    }
-    //}
-
-
     class LVDocument1
     {
         //
@@ -46,7 +30,17 @@ namespace TestCSharpForm
         // Properties
         //
         #region Properties
-        
+
+        // 表示の方向
+        private int direction;
+
+        public int Direction
+        {
+            get { return direction; }
+            set { direction = value; }
+        }
+
+        // 全体の先頭の時間
         private double topTime;
 
         public double TopTime
@@ -55,6 +49,7 @@ namespace TestCSharpForm
             set { topTime = value; }
         }
 
+        // 全体の最後の時間
         private double endTime;
 
         public double EndTime
@@ -63,6 +58,7 @@ namespace TestCSharpForm
             set { endTime = value; }
         }
 
+        // 表示範囲の先頭の時間
         private double dispTopTime;
 
         public double DispTopTime
@@ -71,6 +67,7 @@ namespace TestCSharpForm
             set { dispTopTime = value; }
         }
 
+        // 表示範囲の末尾の時間
         private double dispEndTime;
 
         public double DispEndTime
@@ -79,7 +76,7 @@ namespace TestCSharpForm
             set { dispEndTime = value; }
         }
 
-
+        // 全体のズーム率
         private float zoomRate = 1.0f;
 
         public float ZoomRate
@@ -88,35 +85,80 @@ namespace TestCSharpForm
             set { zoomRate = value; }
         }
 
+        // 1ピクセル当たりの時間
         private LogViewPixTime pixTime;
 
 
         private Image image;                // LogView描画先のImage
 
-        HScrollBar scrollBarH;
-        VScrollBar scrollBarV;
+        private HScrollBar scrollBarH;
+        private VScrollBar scrollBarV;
+
+        private ScrollBar scrollBar1;       // 縦モードのときは水平スクロールバー。横モードのときは垂直スクロールバー
+        private ScrollBar scrollBar2;       // 縦モードのときは垂直スクロールバー。横モードのときは水平スクロールバー
 
         #endregion
 
-        public LVDocument1(int width, int height, HScrollBar scrollBarH, VScrollBar scrollBarV)
+        public LVDocument1(int width, int height, int direction, HScrollBar scrollBarH, VScrollBar scrollBarV)
         {
+            pixTime = new LogViewPixTime();
 
             this.scrollBarH = scrollBarH;
             this.scrollBarV = scrollBarV;
 
-            pixTime = new LogViewPixTime();
+            this.direction = direction;
+            if (direction == 0)
+            {
+                scrollBar1 = scrollBarH;
+                scrollBar2 = scrollBarV;
+            }
+            else
+            {
+                scrollBar1 = scrollBarV;
+                scrollBar2 = scrollBarH;
+            }
 
             topTime = 0.0;
             endTime = 10.0;
             dispTopTime = 0.0;
             dispEndTime = GetDispEndTime();
-            
+
+            scrollBar1.LargeChange = width - (topMarginX + bottomMarginX);
+            scrollBar2.LargeChange = height - (topMarginY + bottomMarginY);
+
+            scrollBar1.Maximum = 1000;
+            scrollBar2.Maximum = (int)pixTime.timeToPix(endTime);
+
             Resize(width, height);
+
         }
 
         // 
         // Methods 
         //
+
+        public void SetDirection(int direction)
+        {
+            this.direction = direction;
+
+            if (direction == 0)
+            {
+                scrollBar1 = scrollBarH;
+                scrollBar2 = scrollBarV;
+            }
+            else
+            {
+                scrollBar1 = scrollBarV;
+                scrollBar2 = scrollBarH;
+            }
+
+            scrollBarH.LargeChange = image.Width - (topMarginX + bottomMarginX);
+            scrollBarV.LargeChange = image.Height - (topMarginY + bottomMarginY);
+
+            scrollBar1.Maximum = 1000;
+            scrollBar2.Maximum = (int)pixTime.timeToPix(endTime);
+
+        }
         public void Resize(int width, int height)
         {
             if (image != null)
@@ -126,11 +168,7 @@ namespace TestCSharpForm
 
             image = new Bitmap(width, height);
 
-            scrollBarH.LargeChange = width - (topMarginX + bottomMarginX);
-            scrollBarV.LargeChange = height - (topMarginY + bottomMarginY);
-
-            scrollBarH.Maximum = 1000;
-            scrollBarV.Maximum = (int)pixTime.timeToPix(endTime);
+            SetDirection(direction);
         }
 
         /**
@@ -139,7 +177,7 @@ namespace TestCSharpForm
          */
         private double GetDispEndTime()
         {
-            return dispTopTime + pixTime.pixToTime(scrollBarV.LargeChange) / zoomRate;
+            return dispTopTime + pixTime.pixToTime(scrollBar2.LargeChange) / zoomRate;
         }
 
         public void setZoomRate(float zoomRate)
@@ -157,11 +195,11 @@ namespace TestCSharpForm
             return (float)(value * zoomRate);
         }
 
+        // scroll::
         private void UpdateScrollY()
         {
-            dispTopTime = topTime + pixTime.pixToTime(scrollBarV.Value) / zoomRate;
+            dispTopTime = topTime + pixTime.pixToTime(scrollBar2.Value) / zoomRate;
             dispEndTime = GetDispEndTime();
-            //Debug.WriteLine("dispTopTime:{0} {1}", dispTopTime, scrollBarV.Value);
         }
 
         public bool ScrollX(int delta)
@@ -171,9 +209,7 @@ namespace TestCSharpForm
 
         public bool ScrollY(int delta)
         {
-            bool ret = ScrollXY(scrollBarV, delta);
-            UpdateScrollY();
-            return ret;
+            return ScrollXY(scrollBarV, delta);
         }
 
         public bool ScrollXY(ScrollBar sb, int delta)
@@ -202,109 +238,212 @@ namespace TestCSharpForm
 
         public bool ScrollDown()
         {
-            return ScrollY(scrollBarV.LargeChange);
+            return ScrollY(scrollBar2.LargeChange);
         }
 
         public bool ScrollUp()
         {
-            return ScrollY(-scrollBarV.LargeChange);
+            return ScrollY(-scrollBar2.LargeChange);
         }
 
         public void Draw(Graphics g)
         {
             using (Graphics g2 = Graphics.FromImage(image))
             {
-                UpdateSBH(scrollBarH.Value);
-                UpdateSBV(scrollBarV.Value);
-
-                // clear background
-                g2.FillRectangle(Brushes.Black, 0, 0, image.Width, image.Height);
-
-                var font1 = new Font("Arial", 10);
-
-                // テキスト表示
-                int x0 = 10;
-                int y0 = 10;
-
-                g2.DrawString(String.Format("dispTopTime:{0} dispEndTime:{1}", dispTopTime, dispEndTime), font1, Brushes.White, x0, y0);
-                y0 += 20;
-                g2.DrawString(String.Format("[sbH] value:{0},large:{1} max:{2}", scrollBarH.Value, scrollBarH.LargeChange, scrollBarH.Maximum),
-                    font1, Brushes.White, x0, y0);
-                y0 += 20;
-                g2.DrawString(String.Format("[sbV] value:{0},large:{1} max:{2}", scrollBarV.Value, scrollBarV.LargeChange, scrollBarV.Maximum),
-                    font1, Brushes.White, x0, y0);
-                y0 += 20;
-                g2.DrawString(String.Format("zoomRate:{0:0.######} pixTime.zoom:{1:0.########}", zoomRate, pixTime.Val), font1, Brushes.White, x0, y0);
-                y0 += 20;
-
-                // クリッピング設定
-                Rectangle rect1 = new Rectangle(topMarginX, topMarginY, scrollBarH.LargeChange, scrollBarV.LargeChange);
-                g2.SetClip(rect1);
-
-                g2.FillRectangle(Brushes.DarkRed, rect1);
-
-                int x = -(scrollBarH.Value % intervalX);
-                int y = -(scrollBarV.Value % intervalY);
-                int intervalX2 = (int)(intervalX * zoomRate);
-                int intervalY2 = (int)(intervalY * zoomRate);
-
-                //--------------------------------
-                // ライン
-                //--------------------------------
-                var font2 = new Font("Arial", getZoomValue(10));
-                // 横のライン
-                while (y < scrollBarV.LargeChange)
+                if (direction == 0)
                 {
-                    g2.DrawLine(Pens.White, topMarginX, topMarginY + y,
-                        image.Width - bottomMarginX, topMarginY + y);
-                    y += intervalY2;
+                    DrawV(g2);
                 }
-                // 縦のライン
-                int offsetX = scrollBarH.Value;
-                while (x < scrollBarH.LargeChange)
+                else
                 {
-                    g2.DrawLine(Pens.White, topMarginX + x, topMarginY,
-                        topMarginX + x, image.Height - bottomMarginY);
-                    x += intervalX2;
+                    DrawH(g2);
                 }
-
-                //--------------------------------
-                // 文字列
-                //--------------------------------
-                x = -(scrollBarH.Value % intervalX2);
-                y = -(scrollBarV.Value % intervalY2);
-
-                StringFormat sf1 = new StringFormat();
-                sf1.Alignment = StringAlignment.Far;
-                sf1.LineAlignment = StringAlignment.Center;
-
-                // set cliping
-                Rectangle rect2 = new Rectangle(0, topMarginY-10, image.Width, image.Height - topMarginY+10);
-                g2.SetClip(rect2);
-
-                // 横のテキスト
-                while (y < scrollBarV.LargeChange)
-                {
-                    double time = dispTopTime + pixTime.pixToTime(y) / zoomRate;
-                    g2.DrawString(String.Format("{0:0.######}s", time),
-                        font2, Brushes.Yellow, topMarginX - 5, topMarginY + y, sf1);
-                    y += intervalY2;
-                }
-
-                // 縦のテキスト
-                Rectangle rect3 = new Rectangle(topMarginX -10, 0, scrollBarH.LargeChange + 10, image.Height - topMarginY);
-                g2.SetClip(rect3);
-                sf1.Alignment = StringAlignment.Center;
-                sf1.LineAlignment = StringAlignment.Far;
-                while (x < scrollBarH.LargeChange + 20)
-                {
-                    g2.DrawString(String.Format("{0}", x / zoomRate + offsetX),
-                        font2, Brushes.Yellow, topMarginX + x, topMarginY - 5, sf1);
-                    x += intervalX2;
-                }
-
             }
             g.DrawImage(image, 0, 0);
+        }
+
+        private void DrawH(Graphics g)
+        {
+            UpdateScrollY();
+            
+            // clear background
+            g.FillRectangle(Brushes.Black, 0, 0, image.Width, image.Height);
+
+            var font1 = new Font("Arial", 10);
+
+            // テキスト表示
+            int x0 = 10;
+            int y0 = 10;
+
+            g.DrawString(String.Format("dispTopTime:{0} dispEndTime:{1}", dispTopTime, dispEndTime), font1, Brushes.White, x0, y0);
+            y0 += 20;
+            g.DrawString(String.Format("[sbH] value:{0},large:{1} max:{2}", scrollBarH.Value, scrollBarH.LargeChange, scrollBarH.Maximum),
+                font1, Brushes.White, x0, y0);
+            y0 += 20;
+            g.DrawString(String.Format("[sbV] value:{0},large:{1} max:{2}", scrollBarV.Value, scrollBarV.LargeChange, scrollBarV.Maximum),
+                font1, Brushes.White, x0, y0);
+            y0 += 20;
+            g.DrawString(String.Format("zoomRate:{0:0.######} pixTime.zoom:{1:0.########}", zoomRate, pixTime.Val), font1, Brushes.White, x0, y0);
+            y0 += 20;
+
+            // クリッピング設定
+            Rectangle rect1 = new Rectangle(topMarginX, topMarginY, scrollBarH.LargeChange, scrollBarV.LargeChange);
+            g.SetClip(rect1);
+
+            g.FillRectangle(Brushes.DarkRed, rect1);
+
+            int x = -(scrollBarH.Value % intervalX);
+            int y = -(scrollBarV.Value % intervalY);
+            int intervalX2 = (int)(intervalX * zoomRate);
+            int intervalY2 = (int)(intervalY * zoomRate);
+
+            //--------------------------------
+            // ライン
+            //--------------------------------
+            var font2 = new Font("Arial", getZoomValue(10));
+            // 横のライン
+            while (y < scrollBarV.LargeChange)
+            {
+                g.DrawLine(Pens.White, topMarginX, topMarginY + y,
+                    image.Width - bottomMarginX, topMarginY + y);
+                y += intervalY2;
+            }
+            // 縦のライン
+            int offsetX = scrollBarV.Value;
+            while (x < scrollBarH.LargeChange)
+            {
+                g.DrawLine(Pens.White, topMarginX + x, topMarginY,
+                    topMarginX + x, image.Height - bottomMarginY);
+                x += intervalX2;
+            }
+
+            //--------------------------------
+            // 文字列
+            //--------------------------------
+            x = -(scrollBarH.Value % intervalX2);
+            y = -(scrollBarV.Value % intervalY2);
+
+            StringFormat sf1 = new StringFormat();
+            sf1.Alignment = StringAlignment.Far;
+            sf1.LineAlignment = StringAlignment.Center;
+
+            // set cliping
+            Rectangle rect2 = new Rectangle(0, topMarginY - 10, image.Width, image.Height - topMarginY + 10);
+            g.SetClip(rect2);
+
+            // 横のテキスト
+            while (y < scrollBarV.LargeChange)
+            {
+                g.DrawString(String.Format("{0}", y / zoomRate + offsetX),
+                    font2, Brushes.Yellow, topMarginX - 5, topMarginY + y, sf1);
+                y += intervalY2;
+            }
+
+            // 縦のテキスト
+            Rectangle rect3 = new Rectangle(topMarginX - 10, 0, scrollBarH.LargeChange + 10, image.Height - topMarginY);
+            g.SetClip(rect3);
+            sf1.Alignment = StringAlignment.Center;
+            sf1.LineAlignment = StringAlignment.Far;
+
+            while (x < scrollBarH.LargeChange + 20)
+            {
+                double time = dispTopTime + pixTime.pixToTime(x) / zoomRate;
+                g.DrawString(String.Format("{0:0.######}s", time),
+                    font2, Brushes.Yellow, topMarginX + x, topMarginY - 5, sf1);
+                x += intervalX2;
+            }
+        }
+
+        private void DrawV(Graphics g)
+        {
+            UpdateScrollY();
+            
+            // clear background
+            g.FillRectangle(Brushes.Black, 0, 0, image.Width, image.Height);
+
+            var font1 = new Font("Arial", 10);
+
+            // テキスト表示
+            int x0 = 10;
+            int y0 = 10;
+
+            g.DrawString(String.Format("dispTopTime:{0} dispEndTime:{1}", dispTopTime, dispEndTime), font1, Brushes.White, x0, y0);
+            y0 += 20;
+            g.DrawString(String.Format("[sbH] value:{0},large:{1} max:{2}", scrollBarH.Value, scrollBarH.LargeChange, scrollBarH.Maximum),
+                font1, Brushes.White, x0, y0);
+            y0 += 20;
+            g.DrawString(String.Format("[sbV] value:{0},large:{1} max:{2}", scrollBarV.Value, scrollBarV.LargeChange, scrollBarV.Maximum),
+                font1, Brushes.White, x0, y0);
+            y0 += 20;
+            g.DrawString(String.Format("zoomRate:{0:0.######} pixTime.zoom:{1:0.########}", zoomRate, pixTime.Val), font1, Brushes.White, x0, y0);
+            y0 += 20;
+
+            // クリッピング設定
+            Rectangle rect1 = new Rectangle(topMarginX, topMarginY, scrollBarH.LargeChange, scrollBarV.LargeChange);
+            g.SetClip(rect1);
+
+            g.FillRectangle(Brushes.DarkRed, rect1);
+
+            int x = -(scrollBarH.Value % intervalX);
+            int y = -(scrollBarV.Value % intervalY);
+            int intervalX2 = (int)(intervalX * zoomRate);
+            int intervalY2 = (int)(intervalY * zoomRate);
+
+            //--------------------------------
+            // ライン
+            //--------------------------------
+            var font2 = new Font("Arial", getZoomValue(10));
+            // 横のライン
+            while (y < scrollBarV.LargeChange)
+            {
+                g.DrawLine(Pens.White, topMarginX, topMarginY + y,
+                    image.Width - bottomMarginX, topMarginY + y);
+                y += intervalY2;
+            }
+            // 縦のライン
+            int offsetX = scrollBarH.Value;
+            while (x < scrollBarH.LargeChange)
+            {
+                g.DrawLine(Pens.White, topMarginX + x, topMarginY,
+                    topMarginX + x, image.Height - bottomMarginY);
+                x += intervalX2;
+            }
+
+            //--------------------------------
+            // 文字列
+            //--------------------------------
+            x = -(scrollBarH.Value % intervalX2);
+            y = -(scrollBarV.Value % intervalY2);
+
+            StringFormat sf1 = new StringFormat();
+            sf1.Alignment = StringAlignment.Far;
+            sf1.LineAlignment = StringAlignment.Center;
+
+            // set cliping
+            Rectangle rect2 = new Rectangle(0, topMarginY - 10, image.Width, image.Height - topMarginY + 10);
+            g.SetClip(rect2);
+
+            // 横のテキスト
+            while (y < scrollBarV.LargeChange)
+            {
+                double time = dispTopTime + pixTime.pixToTime(y) / zoomRate;
+                g.DrawString(String.Format("{0:0.######}s", time),
+                    font2, Brushes.Yellow, topMarginX - 5, topMarginY + y, sf1);
+                y += intervalY2;
+            }
+
+            // 縦のテキスト
+            Rectangle rect3 = new Rectangle(topMarginX - 10, 0, scrollBarH.LargeChange + 10, image.Height - topMarginY);
+            g.SetClip(rect3);
+            sf1.Alignment = StringAlignment.Center;
+            sf1.LineAlignment = StringAlignment.Far;
+            while (x < scrollBarH.LargeChange + 20)
+            {
+                g.DrawString(String.Format("{0}", x / zoomRate + offsetX),
+                    font2, Brushes.Yellow, topMarginX + x, topMarginY - 5, sf1);
+                x += intervalX2;
+            }
+
         }
 
         // Document側で表示情報を更新
@@ -312,7 +451,6 @@ namespace TestCSharpForm
         {
             // スクロールバーに反映
             scrollBarV.Value = value;
-            //Debug.WriteLine("value:{0}", scrollBarV.Value);
             UpdateScrollY();
         }
 
@@ -321,7 +459,6 @@ namespace TestCSharpForm
         {
             // スクロールバーに反映
             scrollBarH.Value = value;
-            //Debug.WriteLine(String.Format("sbH value:{0} max:{1} large:{2}", scrollBarH.Value, scrollBarH.Maximum, scrollBarH.LargeChange));
         }
 
         // zoom::
