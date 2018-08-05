@@ -103,6 +103,8 @@ namespace TestCSharpForm
             this.Scroll += new System.Windows.Forms.ScrollEventHandler(this.FormScrollBar_Scroll);
             this.Paint += new System.Windows.Forms.PaintEventHandler(this.FormScrollBar_Paint);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.FormScrollBar_KeyDown);
+            this.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.FormScrollBar_KeyPress);
+            this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.FormScrollBar_KeyUp);
             this.Resize += new System.EventHandler(this.FormScrollBar_Resize);
             ((System.ComponentModel.ISupportInitialize)(this.bindingSource1)).EndInit();
             this.tableLayoutPanel1.ResumeLayout(false);

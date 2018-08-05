@@ -24,6 +24,9 @@ namespace TestCSharpForm
         private Point mouseDownPos;
         private Point mouseOldPos;
 
+        private bool isControl;
+        private bool isShift;
+
         #endregion
 
         #region メソッド
@@ -52,6 +55,23 @@ namespace TestCSharpForm
                 panel1.Invalidate();
             }
             ;
+        }
+
+        // pixtime::
+        private void PixTimeZoomUp()
+        {
+            if (document1.PixTimeZoomUp())
+            {
+                panel1.Invalidate();
+            }
+        }
+
+        private void PixTimeZoomDown()
+        {
+            if (document1.PixTimeZoomDown())
+            {
+                panel1.Invalidate();
+            }
         }
 
         #endregion メソッド
@@ -162,14 +182,31 @@ namespace TestCSharpForm
                 case Keys.Left:
                     break;
                 case Keys.Up:
-                    ZoomDown();
+                    if (isControl)
+                    {
+                        PixTimeZoomDown();
+                    }
+                    else { 
+                        ZoomDown();
+                    }
                     break;
                 case Keys.Right:
                     break;
                 case Keys.Down:
-                    ZoomUp();
+                    if (isControl)
+                    {
+                        PixTimeZoomUp();
+                    }
+                    else
+                    {
+                        ZoomUp();
+                    }
                     break;
-                case Keys.Control:
+                case Keys.ControlKey:
+                    isControl = true;
+                    break;
+                case Keys.ShiftKey:
+                    isShift = true;
                     break;
                 case Keys.PageDown:
                     if (document1.ScrollDown())
@@ -185,8 +222,39 @@ namespace TestCSharpForm
                     break;
             }
         }
+        
+        private void FormScrollBar_KeyUp(object sender, KeyEventArgs e)
+        {
+            Debug.WriteLine(String.Format("keyup:{0}", e.KeyValue));
+
+            switch ((Keys)e.KeyValue)
+            {
+                case Keys.ControlKey:
+                    isControl = false;
+                    break;
+                case Keys.Shift:
+                    isShift = false;
+                    break;
+            }
+        }
         #endregion イベント
 
+        private void FormScrollBar_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            Debug.WriteLine(String.Format("keypress:{0}", e.KeyChar));
+
+            switch ((Keys)e.KeyChar)
+            {
+                case Keys.Left:
+                    break;
+                case Keys.Control:
+                    isControl = true;
+                    break;
+                case Keys.Shift:
+                    isShift = true;
+                    break;
+            }
+        }
     }
     public class DoubleBufferingPanel : System.Windows.Forms.Panel
     {
