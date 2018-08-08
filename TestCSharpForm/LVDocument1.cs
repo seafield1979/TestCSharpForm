@@ -77,13 +77,7 @@ namespace TestCSharpForm
         }
 
         // 全体のズーム率
-        private float zoomRate = 1.0f;
-
-        public float ZoomRate
-        {
-            get { return zoomRate; }
-            set { zoomRate = value; }
-        }
+        private ZoomRate zoomRate;
 
         // 1ピクセル当たりの時間
         private LogViewPixTime pixTime;
@@ -102,6 +96,7 @@ namespace TestCSharpForm
         public LVDocument1(int width, int height, int direction, HScrollBar scrollBarH, VScrollBar scrollBarV)
         {
             pixTime = new LogViewPixTime();
+            zoomRate = new ZoomRate();
 
             this.scrollBarH = scrollBarH;
             this.scrollBarV = scrollBarV;
@@ -122,7 +117,7 @@ namespace TestCSharpForm
             endTime = 10.0;
             dispTopTime = 0.0;
             dispEndTime = GetDispEndTime();
-
+            
             scrollBar1.LargeChange = width - (topMarginX + bottomMarginX);
             scrollBar2.LargeChange = height - (topMarginY + bottomMarginY);
 
@@ -177,28 +172,30 @@ namespace TestCSharpForm
          */
         private double GetDispEndTime()
         {
-            return dispTopTime + pixTime.pixToTime(scrollBar2.LargeChange) / zoomRate;
+            return dispTopTime + pixTime.pixToTime(scrollBar2.LargeChange) / zoomRate.Value;
         }
 
-        public void setZoomRate(float zoomRate)
+        public void setZoomRate(ZoomRate zoomRate)
         {
             this.zoomRate = zoomRate;
         }
 
+        // 指定の整数値にズーム率をかけた結果を取得
         public int getZoomValue(int value)
         {
-            return (int)(value * zoomRate);
+            return (int)(value * zoomRate.Value);
         }
 
+        // 指定の浮動小数値にズーム率をかけた結果を取得
         public float getZoomValue(float value)
         {
-            return (float)(value * zoomRate);
+            return (float)(value * zoomRate.Value);
         }
 
         // scroll::
         private void UpdateScrollY()
         {
-            dispTopTime = topTime + pixTime.pixToTime(scrollBar2.Value) / zoomRate;
+            dispTopTime = topTime + pixTime.pixToTime(scrollBar2.Value) / zoomRate.Value;
             dispEndTime = GetDispEndTime();
         }
 
@@ -250,6 +247,26 @@ namespace TestCSharpForm
         {
             using (Graphics g2 = Graphics.FromImage(image))
             {
+                // clear background
+                g2.FillRectangle(Brushes.Black, 0, 0, image.Width, image.Height);
+
+                var font1 = new Font("Arial", 10);
+
+                // テキスト表示
+                int x0 = 10;
+                int y0 = 10;
+
+                g2.DrawString(String.Format("dispTopTime:{0} dispEndTime:{1}", dispTopTime, dispEndTime), font1, Brushes.White, x0, y0);
+                y0 += 20;
+                g2.DrawString(String.Format("[sbH] value:{0},large:{1} max:{2}", scrollBarH.Value, scrollBarH.LargeChange, scrollBarH.Maximum),
+                    font1, Brushes.White, x0, y0);
+                y0 += 20;
+                g2.DrawString(String.Format("[sbV] value:{0},large:{1} max:{2}", scrollBarV.Value, scrollBarV.LargeChange, scrollBarV.Maximum),
+                    font1, Brushes.White, x0, y0);
+                y0 += 20;
+                g2.DrawString(String.Format("zoomRate:{0:0.######} pixTime.zoom:{1:0.########}", zoomRate, pixTime.Val), font1, Brushes.White, x0, y0);
+                y0 += 20;
+
                 if (direction == 0)
                 {
                     DrawV(g2);
@@ -262,30 +279,11 @@ namespace TestCSharpForm
             g.DrawImage(image, 0, 0);
         }
 
+        // 横にログが進んでいく描画モード
         private void DrawH(Graphics g)
         {
             UpdateScrollY();
             
-            // clear background
-            g.FillRectangle(Brushes.Black, 0, 0, image.Width, image.Height);
-
-            var font1 = new Font("Arial", 10);
-
-            // テキスト表示
-            int x0 = 10;
-            int y0 = 10;
-
-            g.DrawString(String.Format("dispTopTime:{0} dispEndTime:{1}", dispTopTime, dispEndTime), font1, Brushes.White, x0, y0);
-            y0 += 20;
-            g.DrawString(String.Format("[sbH] value:{0},large:{1} max:{2}", scrollBarH.Value, scrollBarH.LargeChange, scrollBarH.Maximum),
-                font1, Brushes.White, x0, y0);
-            y0 += 20;
-            g.DrawString(String.Format("[sbV] value:{0},large:{1} max:{2}", scrollBarV.Value, scrollBarV.LargeChange, scrollBarV.Maximum),
-                font1, Brushes.White, x0, y0);
-            y0 += 20;
-            g.DrawString(String.Format("zoomRate:{0:0.######} pixTime.zoom:{1:0.########}", zoomRate, pixTime.Val), font1, Brushes.White, x0, y0);
-            y0 += 20;
-
             // クリッピング設定
             Rectangle rect1 = new Rectangle(topMarginX, topMarginY, scrollBarH.LargeChange, scrollBarV.LargeChange);
             g.SetClip(rect1);
@@ -294,8 +292,8 @@ namespace TestCSharpForm
 
             int x = -(scrollBarH.Value % intervalX);
             int y = -(scrollBarV.Value % intervalY);
-            int intervalX2 = (int)(intervalX * zoomRate);
-            int intervalY2 = (int)(intervalY * zoomRate);
+            int intervalX2 = (int)(intervalX * zoomRate.Value);
+            int intervalY2 = (int)(intervalY * zoomRate.Value);
 
             //--------------------------------
             // ライン
@@ -334,7 +332,7 @@ namespace TestCSharpForm
             // 横のテキスト
             while (y < scrollBarV.LargeChange)
             {
-                g.DrawString(String.Format("{0}", y / zoomRate + offsetX),
+                g.DrawString(String.Format("{0}", (y + offsetX) / zoomRate.Value),
                     font2, Brushes.Yellow, topMarginX - 5, topMarginY + y, sf1);
                 y += intervalY2;
             }
@@ -347,37 +345,18 @@ namespace TestCSharpForm
 
             while (x < scrollBarH.LargeChange + 20)
             {
-                double time = dispTopTime + pixTime.pixToTime(x) / zoomRate;
+                double time = dispTopTime + pixTime.pixToTime(x) / zoomRate.Value;
                 g.DrawString(String.Format("{0:0.######}s", time),
                     font2, Brushes.Yellow, topMarginX + x, topMarginY - 5, sf1);
                 x += intervalX2;
             }
         }
 
+        // 縦(下)にログが進んでいくモード
         private void DrawV(Graphics g)
         {
             UpdateScrollY();
             
-            // clear background
-            g.FillRectangle(Brushes.Black, 0, 0, image.Width, image.Height);
-
-            var font1 = new Font("Arial", 10);
-
-            // テキスト表示
-            int x0 = 10;
-            int y0 = 10;
-
-            g.DrawString(String.Format("dispTopTime:{0} dispEndTime:{1}", dispTopTime, dispEndTime), font1, Brushes.White, x0, y0);
-            y0 += 20;
-            g.DrawString(String.Format("[sbH] value:{0},large:{1} max:{2}", scrollBarH.Value, scrollBarH.LargeChange, scrollBarH.Maximum),
-                font1, Brushes.White, x0, y0);
-            y0 += 20;
-            g.DrawString(String.Format("[sbV] value:{0},large:{1} max:{2}", scrollBarV.Value, scrollBarV.LargeChange, scrollBarV.Maximum),
-                font1, Brushes.White, x0, y0);
-            y0 += 20;
-            g.DrawString(String.Format("zoomRate:{0:0.######} pixTime.zoom:{1:0.########}", zoomRate, pixTime.Val), font1, Brushes.White, x0, y0);
-            y0 += 20;
-
             // クリッピング設定
             Rectangle rect1 = new Rectangle(topMarginX, topMarginY, scrollBarH.LargeChange, scrollBarV.LargeChange);
             g.SetClip(rect1);
@@ -386,8 +365,8 @@ namespace TestCSharpForm
 
             int x = -(scrollBarH.Value % intervalX);
             int y = -(scrollBarV.Value % intervalY);
-            int intervalX2 = (int)(intervalX * zoomRate);
-            int intervalY2 = (int)(intervalY * zoomRate);
+            int intervalX2 = (int)(intervalX * zoomRate.Value);
+            int intervalY2 = (int)(intervalY * zoomRate.Value);
 
             //--------------------------------
             // ライン
@@ -426,7 +405,7 @@ namespace TestCSharpForm
             // 横のテキスト
             while (y < scrollBarV.LargeChange)
             {
-                double time = dispTopTime + pixTime.pixToTime(y) / zoomRate;
+                double time = dispTopTime + pixTime.pixToTime(y) / zoomRate.Value;
                 g.DrawString(String.Format("{0:0.######}s", time),
                     font2, Brushes.Yellow, topMarginX - 5, topMarginY + y, sf1);
                 y += intervalY2;
@@ -439,7 +418,7 @@ namespace TestCSharpForm
             sf1.LineAlignment = StringAlignment.Far;
             while (x < scrollBarH.LargeChange + 20)
             {
-                g.DrawString(String.Format("{0}", x / zoomRate + offsetX),
+                g.DrawString(String.Format("{0}", (x + offsetX) / zoomRate.Value),
                     font2, Brushes.Yellow, topMarginX + x, topMarginY - 5, sf1);
                 x += intervalX2;
             }
@@ -480,9 +459,11 @@ namespace TestCSharpForm
             return true;
         }
 
+        // 全体のズーム率
+        // 拡大
         public bool ZoomUp()
         {
-            zoomRate *= 2.0f;
+            zoomRate.ZoomIn();
             ChangeZoomRate();
             return true;
         }
@@ -490,7 +471,7 @@ namespace TestCSharpForm
         // 縮小
         public bool ZoomDown()
         {
-            zoomRate *= 0.5f;
+            zoomRate.ZoomOut();
             ChangeZoomRate();
             return true;
         }
@@ -500,7 +481,28 @@ namespace TestCSharpForm
         {
             // 拡大したときの動作としてスクロールバーのmaxが変化するパターンと
             // LargeChangeが変化するパターンがあるが、ここではmaxが変換するパターンを採用
-            scrollBarV.Maximum = (int)((endTime - topTime) * zoomRate / pixTime.Val);
+            scrollBarH.Maximum = (int)(1000 * zoomRate.Value);
+            scrollBarV.Maximum = (int)((endTime - topTime) * zoomRate.Value / pixTime.Val);
+
+            if (scrollBarH.LargeChange > scrollBarH.Maximum)
+            {
+                scrollBarH.Enabled = false;
+                scrollBarH.LargeChange = scrollBarH.Maximum;
+            }
+            else
+            {
+                scrollBarH.Enabled = true;
+            }
+
+            if (scrollBarV.LargeChange > scrollBarV.Maximum)
+            {
+                scrollBarH.Enabled = false;
+                scrollBarV.LargeChange = scrollBarV.Maximum;
+            }
+            else
+            {
+                scrollBarH.Enabled = true;
+            }
         }
     }
 
@@ -579,6 +581,78 @@ namespace TestCSharpForm
         public double pixToTime(int pix)
         {
             return pix * val;
+        }
+    }
+
+    /*
+     * 拡大率を管理するクラス
+     */
+    class ZoomRate
+    {
+        enum EZoomRate : byte
+        {
+            E50P = 0,
+            E67P,
+            E75P,
+            E80P,
+            E90P,
+            E100P,  // 100%
+            E110P,
+            E125P,
+            E150P,
+            E175P,
+            E200P,
+            E250P,
+            E300P,
+            E400P
+        }
+        private EZoomRate zoomRate;
+
+        private float value;
+
+        public float Value
+        {
+            get { return value; }
+            set { value = value; }
+        }
+
+        //
+        // Consts
+        //
+        private float[] eToV = new float[] { 0.5f, 0.67f, 0.75f, 0.8f, 0.9f, 1.0f, 1.1f, 1.25f, 1.5f, 1.75f, 2.0f, 2.5f, 3.0f, 4.0f };
+
+        //
+        // Constructor
+        // 
+        public ZoomRate()
+        {
+            zoomRate = EZoomRate.E100P;
+            SetZoomValue();
+        }
+
+        private void SetZoomValue()
+        {
+            value = eToV[(byte)zoomRate];
+        }
+
+        public float ZoomIn()
+        {
+            if (zoomRate < EZoomRate.E400P)
+            {
+                zoomRate++;
+            }
+            SetZoomValue();
+            return value;
+        }
+
+        public float ZoomOut()
+        {
+            if (zoomRate > EZoomRate.E50P)
+            {
+                zoomRate--;
+            }
+            SetZoomValue();
+            return value;
         }
     }
 }
