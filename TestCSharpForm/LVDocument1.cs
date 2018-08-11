@@ -511,17 +511,201 @@ namespace TestCSharpForm
      */
     class LogViewPixTime
     {
+        struct SPixTime
+        {
+            //public string unitName;    // 時間の単位
+            public EUnitType unitType;  // 時間の単位
+            public double pixTime;     // 1ピクセル当たりの時間
+            public double calcTime;    // unitTime計算用の掛け算の値
+        }
+
+        // 時間の単位
+        enum EUnitType : byte
+        {
+            Nano,       // ナノ秒  1/1000000000
+            Micro,      // マイクロ秒 1/1000000
+            Milli,      // ミリ秒 1/1000
+            Second      // 秒
+        }
+
+        enum EPixTime : byte
+        {
+            E1_0N,     // 1pix = 1nano s
+            E1_5N,
+            E2_0N,
+            E3_0N,
+            E5_0N,
+            E7_5N,
+            E10N,
+            E15N,
+            E20N,
+            E30N,
+            E50N,
+            E75N,
+            E100N,
+            E150N,
+            E200N,
+            E300N,
+            E500N,
+            E750N,
+            E1_0U,       // 1pix = 1 micro s
+            E1_5U,
+            E2_0U,
+            E3_0U,
+            E5_0U,
+            E7_5U,
+            E10U,
+            E15U,
+            E20U,
+            E30U,
+            E50U,
+            E75U,
+            E100U,
+            E150U,
+            E200U,
+            E300U,
+            E500U,
+            E750U,
+            E1_0M,      // 1pix = 1 milli second
+            E1_5M,
+            E2_0M,
+            E3_0M,
+            E5_0M,
+            E7_5M,
+            E10M,       
+            E15M,
+            E20M,
+            E30M,
+            E50M,
+            E75M,
+            E100M,
+            E150M,
+            E200M,
+            E300M,
+            E500M,
+            E750M,
+            E1_0S,      // 1pix = 1 second
+            E1_5S,
+            E2_0S,
+            E3_0S,
+            E5_0S,
+            E7_5S,
+            E10S,
+            E15S,
+            E20S,
+            E30S,
+            E50S,
+            E75S,
+            E100S,
+            E150S,
+            E200S,
+            E300S,
+            E500S,
+            E750S,
+            E1000S
+        }
+
+        static SPixTime[] pixTimeTbl = new SPixTime[]
+        {
+            new SPixTime(){ unitType=EUnitType.Nano, pixTime = 0.000000001, calcTime=0.1 },
+            new SPixTime(){ unitType=EUnitType.Nano, pixTime = 0.0000000015 },
+            new SPixTime(){ unitType=EUnitType.Nano, pixTime = 0.000000002 },
+            new SPixTime(){ unitType=EUnitType.Nano, pixTime = 0.000000003 },
+            new SPixTime(){ unitType=EUnitType.Nano, pixTime = 0.000000005 },
+            new SPixTime(){ unitType=EUnitType.Nano, pixTime = 0.0000000075 },
+
+            new SPixTime(){ unitType=EUnitType.Nano, pixTime = 0.00000001 },
+            new SPixTime(){ unitType=EUnitType.Nano, pixTime = 0.000000015 },
+            new SPixTime(){ unitType=EUnitType.Nano, pixTime = 0.00000002 },
+            new SPixTime(){ unitType=EUnitType.Nano, pixTime = 0.00000003 },
+            new SPixTime(){ unitType=EUnitType.Nano, pixTime = 0.00000005 },
+            new SPixTime(){ unitType=EUnitType.Nano, pixTime = 0.000000075 },
+
+            new SPixTime(){ unitType=EUnitType.Nano, pixTime = 0.0000001 },
+            new SPixTime(){ unitType=EUnitType.Nano, pixTime = 0.00000015 },
+            new SPixTime(){ unitType=EUnitType.Nano, pixTime = 0.0000002 },
+            new SPixTime(){ unitType=EUnitType.Nano, pixTime = 0.0000003 },
+            new SPixTime(){ unitType=EUnitType.Nano, pixTime = 0.0000005 },
+            new SPixTime(){ unitType=EUnitType.Nano, pixTime = 0.00000075 },
+
+            new SPixTime(){ unitType=EUnitType.Micro, pixTime = 0.000001 },
+            new SPixTime(){ unitType=EUnitType.Micro, pixTime = 0.0000015 },
+            new SPixTime(){ unitType=EUnitType.Micro, pixTime = 0.000002 },
+            new SPixTime(){ unitType=EUnitType.Micro, pixTime = 0.000003 },
+            new SPixTime(){ unitType=EUnitType.Micro, pixTime = 0.000005 },
+            new SPixTime(){ unitType=EUnitType.Micro, pixTime = 0.0000075 },
+
+            new SPixTime(){ unitType=EUnitType.Micro, pixTime = 0.00001 },
+            new SPixTime(){ unitType=EUnitType.Micro, pixTime = 0.000015 },
+            new SPixTime(){ unitType=EUnitType.Micro, pixTime = 0.00002 },
+            new SPixTime(){ unitType=EUnitType.Micro, pixTime = 0.00003 },
+            new SPixTime(){ unitType=EUnitType.Micro, pixTime = 0.00005 },
+            new SPixTime(){ unitType=EUnitType.Micro, pixTime = 0.000075 },
+
+            new SPixTime(){ unitType=EUnitType.Micro, pixTime = 0.0001 },
+            new SPixTime(){ unitType=EUnitType.Micro, pixTime = 0.00015 },
+            new SPixTime(){ unitType=EUnitType.Micro, pixTime = 0.0002 },
+            new SPixTime(){ unitType=EUnitType.Micro, pixTime = 0.0003 },
+            new SPixTime(){ unitType=EUnitType.Micro, pixTime = 0.0005 },
+            new SPixTime(){ unitType=EUnitType.Micro, pixTime = 0.00075 },
+
+            new SPixTime(){ unitType=EUnitType.Milli, pixTime = 0.001 },
+            new SPixTime(){ unitType=EUnitType.Milli, pixTime = 0.0015 },
+            new SPixTime(){ unitType=EUnitType.Milli, pixTime = 0.002 },
+            new SPixTime(){ unitType=EUnitType.Milli, pixTime = 0.003 },
+            new SPixTime(){ unitType=EUnitType.Milli, pixTime = 0.005 },
+            new SPixTime(){ unitType=EUnitType.Milli, pixTime = 0.0075 },
+
+            new SPixTime(){ unitType=EUnitType.Milli, pixTime = 0.01 },
+            new SPixTime(){ unitType=EUnitType.Milli, pixTime = 0.015 },
+            new SPixTime(){ unitType=EUnitType.Milli, pixTime = 0.02 },
+            new SPixTime(){ unitType=EUnitType.Milli, pixTime = 0.03 },
+            new SPixTime(){ unitType=EUnitType.Milli, pixTime = 0.05 },
+            new SPixTime(){ unitType=EUnitType.Milli, pixTime = 0.075 },
+
+            new SPixTime(){ unitType=EUnitType.Milli, pixTime = 0.1 },
+            new SPixTime(){ unitType=EUnitType.Milli, pixTime = 0.15 },
+            new SPixTime(){ unitType=EUnitType.Milli, pixTime = 0.2 },
+            new SPixTime(){ unitType=EUnitType.Milli, pixTime = 0.3 },
+            new SPixTime(){ unitType=EUnitType.Milli, pixTime = 0.5 },
+            new SPixTime(){ unitType=EUnitType.Milli, pixTime = 0.75 },
+
+            new SPixTime(){ unitType=EUnitType.Second, pixTime = 1 },
+            new SPixTime(){ unitType=EUnitType.Second, pixTime = 1.5 },
+            new SPixTime(){ unitType=EUnitType.Second, pixTime = 2.0 },
+            new SPixTime(){ unitType=EUnitType.Second, pixTime = 3.0 },
+            new SPixTime(){ unitType=EUnitType.Second, pixTime = 5.0 },
+            new SPixTime(){ unitType=EUnitType.Second, pixTime = 7.5 },
+
+            new SPixTime(){ unitType=EUnitType.Second, pixTime = 10 },
+            new SPixTime(){ unitType=EUnitType.Second, pixTime = 15 },
+            new SPixTime(){ unitType=EUnitType.Second, pixTime = 20 },
+            new SPixTime(){ unitType=EUnitType.Second, pixTime = 30 },
+            new SPixTime(){ unitType=EUnitType.Second, pixTime = 50 },
+            new SPixTime(){ unitType=EUnitType.Second, pixTime = 75 },
+
+            new SPixTime(){ unitType=EUnitType.Second, pixTime = 100 },
+            new SPixTime(){ unitType=EUnitType.Second, pixTime = 150 },
+            new SPixTime(){ unitType=EUnitType.Second, pixTime = 200 },
+            new SPixTime(){ unitType=EUnitType.Second, pixTime = 300 },
+            new SPixTime(){ unitType=EUnitType.Second, pixTime = 500 },
+            new SPixTime(){ unitType=EUnitType.Second, pixTime = 750 },
+
+            new SPixTime(){ unitType=EUnitType.Second, pixTime = 1000 },
+        };
+
         //
         // Properties
         //
 
-        // 1pixelあたりの時間
-        private double val;
+        private EPixTime pixTime;
 
+        // 1pixelあたりの時間
         public double Val
         {
-            get { return val; }
-            set { val = value; }
+            get {
+                return pixTimeTbl[(byte)pixTime].pixTime;
+            }
         }
 
         //
@@ -530,7 +714,7 @@ namespace TestCSharpForm
         public LogViewPixTime()
         {
             // 1000pix = 1sec -> 1pix = 0.001sec = 1ms
-            val = 0.001;
+            pixTime = EPixTime.E1_0M;
         }
 
         //
@@ -543,7 +727,10 @@ namespace TestCSharpForm
          */
         public void ZoomIn()
         {
-            val *= 0.8f;
+            if(pixTime > EPixTime.E1_0N)
+            {
+                pixTime--;
+            }
         }
 
         /**
@@ -553,13 +740,16 @@ namespace TestCSharpForm
          */
         public void ZoomOut()
         {
-            val *= 1.2f;
+            if (pixTime < EPixTime.E1000S)
+            {
+                pixTime++;
+            }
         }
 
         public override string ToString()
         {
             //return String.Format("1pix={0}sec", val);
-            return String.Format("1sec={0}pix", val);
+            return String.Format("1sec={0}pix", Val);
         }
 
         /**
@@ -570,7 +760,7 @@ namespace TestCSharpForm
         public UInt64 timeToPix(double time)
         {
             // 1秒あたりのpixel数を取得してから時間(sec)を書ける
-            return (UInt64)((1.0 / val) * time);
+            return (UInt64)((1.0 / Val) * time);
         }
 
         /**
@@ -580,7 +770,7 @@ namespace TestCSharpForm
          */
         public double pixToTime(int pix)
         {
-            return pix * val;
+            return pix * Val;
         }
     }
 
